@@ -1,0 +1,62 @@
+""" from PyPDF2 import PdfReader
+
+# Replace with the path to your PDF file
+file_path = 'Mathmatics Q 1.pdf'
+
+reader = PdfReader(file_path)
+
+# Print the number of pages
+print(f"Number of pages: {len(reader.pages)}\n\n")
+
+# Document information
+print(reader.metadata)
+
+print() # Add Blank line
+
+# Extract and print text from Page 1
+page_1 = reader.pages[0]  # Access the first page (0-indexed)
+page_1_text = page_1.extract_text()  # Extract text from the page
+# print("Content of Page 1:\n\n")
+# print(page_1_text)
+
+
+# Extract and print text from all pages
+for i in range(len(reader.pages)):
+    page = reader.pages[i]
+    print(page.extract_text())
+
+
+# Extract images and save it here in VS code
+for i in page.images:
+    with open(i.name,'wb') as f:
+        f.write(i.data)
+ """
+
+
+import pdfplumber
+import pandas as pd
+
+# Path to your PDF file
+file_path = r'C:\Users\hp\Downloads\ast_sci_data_tables_sample.pdf'  # Use your file's path here
+output_path = r'C:\Users\hp\Downloads\output_tables.xlsx'  # Path where you want to save the output
+
+# Initialize a writer for Excel
+with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+    # Open the PDF with pdfplumber
+    with pdfplumber.open(file_path) as pdf:
+        # Loop through each page
+        for page_num, page in enumerate(pdf.pages):
+            # Extract tables from the page
+            tables = page.extract_tables()
+            
+            # If tables are found, convert each table to a DataFrame and save it to Excel
+            for table_index, table in enumerate(tables):
+                # Convert the table to a pandas DataFrame
+                df = pd.DataFrame(table[1:], columns=table[0])
+                
+                # Write each DataFrame to a different sheet in the Excel file
+                sheet_name = f'Page_{page_num + 1}_Table_{table_index + 1}'
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+print(f"Tables have been saved to '{output_path}'.")
+
